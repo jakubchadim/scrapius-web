@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scrapius.dev — The Unblockable Web Scraping API (Private Beta)</title>
+  <meta name="description" content="Client-side scraping that runs in the browser, delivers instant, live data from any site, and ships clean JSON straight to your app. Join the waitlist for priority access." />
+  <meta property="og:title" content="Scrapius.dev — Unblockable Web Scraping" />
+  <meta property="og:description" content="Instant DOM extraction with live updates and optional human confirmation. Private beta now open." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0A60FF" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+      :root{
+          --bg: #070d1f;
+          --bg-2:#0a122a;
+          --card:#0f1730;
+          --border:#243056;
+          --muted:#b9c5ff;
+          --text:#eef2ff;
+          --accent:#4B7BFF;
+          --accent-2:#00D1FF;
+          --accent-3:#28c073;
+          --warning:#ff7a7a;
+          --ok:#65ffa7;
+          --shadow: 0 10px 30px rgba(0,0,0,0.35);
+          --radius:14px;
+      }
+
+      *{box-sizing:border-box}
+      html{scroll-behavior:smooth}
+      body{
+          margin:0;
+          font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;
+          color:var(--text);
+          background:
+                  radial-gradient(1200px 600px at 20% -10%, rgba(10,96,255,0.18), transparent 55%),
+                  radial-gradient(900px 500px at 100% 10%, rgba(0,209,255,0.14), transparent 60%),
+                  linear-gradient(180deg, #060b1d, #091129 35%, #071028 100%);
+          min-height:100vh;
+      }
+
+      /* Announcement */
+      .announce{
+          background:linear-gradient(90deg, rgba(75,123,255,0.25), rgba(0,209,255,0.25));
+          color:#e7ecff;
+          text-align:center;
+          padding:10px 14px;
+          font-size:.92rem;
+          border-bottom:1px solid rgba(255,255,255,0.08);
+          backdrop-filter:saturate(120%) blur(6px);
+      }
+
+      /* Header */
+      header{
+          position:sticky; top:0; z-index:50;
+          background:rgba(7,13,31,0.65);
+          backdrop-filter: blur(10px) saturate(140%);
+          border-bottom:1px solid rgba(255,255,255,0.06);
+      }
+      .nav{
+          max-width:1120px; margin:0 auto; padding:14px 20px;
+          display:flex; align-items:center; justify-content:space-between;
+          gap:16px;
+      }
+      .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text)}
+      .brand img{width:40px; height:40px; display:block}
+      .brand .name{font-weight:700; letter-spacing:.2px; color: #fff; font-size: 1.75em;}
+      .nav a{color:var(--muted); text-decoration:none; font-weight:600; font-size:.95rem}
+      .nav a:hover{color:#fff}
+      .nav-links{display:flex; gap:20px; align-items:center}
+      .btn{
+          background:linear-gradient(180deg, var(--accent), #305fff);
+          color:#fff; padding:10px 16px; border-radius:10px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 10px 22px rgba(75,123,255,.35);
+          border:1px solid rgba(255,255,255,0.12)
+      }
+      .btn:hover{filter:brightness(1.06)}
+      .btn.secondary{
+          background:transparent; border:1px solid var(--border); box-shadow:none; color:#e3e9ff;
+      }
+      .container{max-width:1120px; margin:0 auto; padding:0 20px}
+
+      /* Hero */
+      .hero{padding:72px 0 36px}
+      .hero-wrap{
+          display:grid; grid-template-columns: 1.2fr .8fr; gap:28px; align-items:center;
+      }
+      .kicker{color:var(--accent-2); font-weight:700; letter-spacing:.3px; text-transform:uppercase; font-size:.9rem; margin-bottom:10px}
+      h1{font-size:56px; line-height:1.05; margin:0 0 14px}
+      h1 .accent{background:linear-gradient(90deg,#6fa0ff,#00d1ff); -webkit-background-clip:text; background-clip:text; color:transparent}
+      .sub{font-size:1.15rem; color:#c9d4ff; max-width:640px}
+      .tags{margin-top:16px; display:flex; flex-wrap:wrap; gap:10px}
+      .tag{background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#dbe3ff; padding:7px 12px; border-radius:999px; font-weight:600; font-size:.9rem}
+      .hero-cta{margin-top:20px; display:flex; gap:12px; align-items:center}
+
+      .hero-card{
+          background:linear-gradient(180deg, rgba(15,23,48,0.9), rgba(15,23,48,0.6));
+          border:1px solid var(--border);
+          border-radius:var(--radius);
+          padding:18px;
+          box-shadow:var(--shadow);
+      }
+      .hero-card h3{margin:0 0 8px}
+      .mini-list{margin:8px 0 0; padding:0 0 0 18px; color:#cbd6ff}
+
+      /* Section shells */
+      section{padding:64px 0}
+      h2{font-size:40px; margin:0 0 10px}
+      .lead{color:#cbd6ff}
+
+      /* How it Works */
+      .hiw{
+          position:relative;
+      }
+      .hiw .flow{
+          margin-top:18px;
+          display:grid;
+          grid-template-columns: 1fr 80px 1fr 80px 1.2fr 80px 1fr 1fr;
+          align-items:center; gap:16px;
+      }
+      .card{
+          background:var(--card);
+          border:1px solid var(--border);
+          border-radius:var(--radius);
+          padding:16px; min-height:120px;
+          box-shadow:var(--shadow);
+      }
+      .card h4{margin:0 0 6px}
+      .muted{color:#b7c5ff}
+      .pipe{
+          height:12px; background:linear-gradient(90deg,#1b2444,#0f1730);
+          border:1px solid var(--border); border-radius:999px; position:relative; overflow:hidden;
+      }
+      @keyframes travel{0%{left:-10px}100%{left:calc(100% + 10px)}}
+
+      .review .diff{
+          background:var(--bg-2);
+          border:1px dashed #3953a4;
+          border-radius:10px; padding:10px; margin:8px 0 10px;
+          font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.95rem;
+      }
+      .diff-row{
+          display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; padding:6px 0;
+          border-bottom:1px solid rgba(255,255,255,0.06);
+      }
+      .diff-row:last-child{border-bottom:0}
+      .diff .key{color:#9fb4ff}
+      .diff .old{color:var(--warning); text-decoration:line-through; opacity:.9}
+      .diff .new{color:var(--ok); font-weight:700}
+
+      .confirm{
+          background:linear-gradient(180deg, #3e68db, var(--accent));
+          color:#fff; border:0; border-radius:10px; padding:10px 14px; font-weight:800; cursor:pointer;
+          box-shadow:0 10px 22px rgba(75,123,255,.35);
+          transition:transform .08s ease, filter .2s ease, box-shadow .2s ease;
+      }
+      .confirm:hover{filter:brightness(1.06)}
+      .confirm:active{transform:translateY(1px)}
+      .confirm.sent{background:linear-gradient(180deg, #27b36b, var(--accent-3)); box-shadow:0 10px 22px rgba(40,192,115,.35)}
+      .hint{display:block; margin-top:6px; font-size:.85rem; color:#b8c6ff}
+
+      /* Benefits & Use cases */
+      .grid{
+          display:grid; gap:16px; grid-template-columns: repeat(3, 1fr);
+      }
+      .point{
+          background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow);
+      }
+      .point h4{margin:0 0 6px}
+
+      /* NEW: icons for benefit cards */
+      .point .icon-bg{
+          width:44px; height:44px; border-radius:12px;
+          background: radial-gradient(60% 80% at 30% 10%, rgba(75,123,255,.35), rgba(0,0,0,0));
+          border:1px solid var(--border);
+          display:inline-flex; align-items:center; justify-content:center;
+          margin-bottom:10px;
+          box-shadow: 0 8px 18px rgba(75,123,255,.15);
+      }
+      .point .icon{
+          width:26px; height:26px; color:var(--accent);
+      }
+      .point .muted{margin-top:4px}
+
+      /* Waitlist */
+      .signup{
+          background:linear-gradient(180deg, rgba(10,18,42,0.7), rgba(15,23,48,0.7));
+          border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow);
+          max-width:760px;
+      }
+      form{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+      form .full{grid-column:1/-1}
+      input, select{
+          background:#0c1636; color:#eaf0ff; border:1px solid #2b3a66; border-radius:10px; padding:12px; font-size:1rem; outline:none;
+      }
+      input::placeholder{color:#a7b6ea}
+      .consent{display:flex; align-items:center; gap:10px; color:#cdd7ff; font-size:.95rem}
+      .consent input{width:auto}
+      .submit{justify-self:start}
+      .success{
+          display:none; margin-top:10px; color:#9fffd0; font-weight:700
+      }
+      .success.show{display:block}
+
+      /* FAQ */
+      .faq .q{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin:10px 0; box-shadow:var(--shadow)}
+      .faq h4{margin:0 0 6px}
+
+      /* Footer */
+      footer{
+          border-top:1px solid rgba(255,255,255,0.07);
+          padding:28px 0 40px; color:#c9d4ff
+      }
+      .foot{
+          display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap
+      }
+      .foot .links a{color:#c9d4ff; text-decoration:none; margin-right:14px}
+      .foot .links a:hover{color:#fff}
+      .foot .copy{opacity:.8}
+
+      /* Animations */
+      .fade{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease}
+      .fade.show{opacity:1; transform:translateY(0)}
+      .pulse{
+          position:absolute; inset:-2px; border-radius:inherit; background:radial-gradient(120px 20px at 20% 0%, rgba(75,123,255,.26), transparent 70%);
+          pointer-events:none; filter:blur(12px); opacity:.6
+      }
+
+      /* VISUAL animated SVG section */
+      #visual{padding:50px 0; text-align:center}
+      #visual .lead{color:var(--muted); max-width:760px; margin:8px auto 22px}
+      .vis-wrap{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 10px 28px rgba(0,0,0,.35)}
+      svg{width:100%; height:auto}
+      .node{fill:#0c1533; stroke:var(--border); stroke-width:1}
+      .node-title{fill:#eaf0ff; font-weight:700}
+      .node-sub{fill:#bcd0ff; font-size:12px}
+      .pipe{stroke:#2a3a6a; stroke-width:4}
+      .pipe-arrow{marker-end:url(#arrow)}
+      .glow{filter:url(#g)}
+      .packet{fill:#4B7BFF}
+      .packet2{fill:#00D1FF}
+      .packet3{fill:#28c073}
+      /* fallback CSS animation for packets (works alongside SVG animate) */
+
+      /* Responsive */
+      @media (max-width: 980px){
+          .hero-wrap{grid-template-columns:1fr}
+          h1{font-size:42px}
+          .hiw .flow{grid-template-columns:1fr; gap:14px}
+          .grid{grid-template-columns:1fr}
+          form{grid-template-columns:1fr}
+          .submit{justify-self:stretch}
+      }
+  </style>
+</head>
+<body>
+
+<div class="announce">Private beta now open — join the waitlist for priority access.</div>
+
+<header>
+  <nav class="nav">
+    <a class="brand" href="#top">
+      <img src="./logo.png" alt="Scrapius.dev logo" />
+      <span class="name">Scrapius.dev</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#benefits">Benefits</a>
+      <a href="#use-cases">Use cases</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn secondary" href="#signup">Join the Waitlist</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top" class="container">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-wrap">
+      <div>
+        <div class="kicker">Private Beta</div>
+        <h1>The <span class="accent">Unblockable</span> Web Scraping API</h1>
+        <p class="sub">
+          Run scraping where sites can’t block it — the user’s browser. Scrapius.dev uses the live session/IP,
+          reads the DOM directly, and streams clean data in real time.
+        </p>
+        <div class="tags">
+          <span class="tag">No blocks</span>
+          <span class="tag">Instant data</span>
+          <span class="tag">Live updates</span>
+          <span class="tag">Low cost</span>
+        </div>
+        <div class="hero-cta">
+          <a class="btn" href="#signup">Join the Waitlist</a>
+          <a class="btn secondary" href="#how-it-works">How it Works</a>
+        </div>
+      </div>
+
+      <img src="./browser.png" class="fade" style="display: block; width: 100%;" />
+      <!-- <div class="hero-card fade">
+        Play video
+      </div> -->
+    </div>
+  </section>
+
+  <section id="visual">
+    <h2>See the flow at a glance</h2>
+    <p class="lead">Browser extension captures the DOM, highlights changes for optional confirmation, then ships data directly to your app or any endpoint.</p>
+    <div class="vis-wrap">
+      <svg viewBox="0 0 960 260" role="img" aria-label="Scrapius.dev in-browser scraping flow">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3a57a8"></path>
+          </marker>
+          <filter id="g" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3"></feGaussianBlur>
+          </filter>
+        </defs>
+
+        <!-- Pipes -->
+        <path class="pipe pipe-arrow" d="M170 130 L380 130" fill="none"/>
+        <path class="pipe pipe-arrow" d="M430 130 L610 130" fill="none"/>
+        <path class="pipe pipe-arrow" d="M660 130 L820 90" fill="none"/>
+        <path class="pipe pipe-arrow" d="M660 130 L820 170" fill="none"/>
+
+        <!-- Nodes -->
+        <!-- 1: Browser -->
+        <g transform="translate(60,70)">
+          <rect class="node glow" rx="12" width="100" height="120"></rect>
+          <rect x="10" y="14" width="80" height="10" fill="#1a2753" rx="4"></rect>
+          <rect x="10" y="30" width="80" height="70" fill="#0b1433" rx="6" stroke="#2c3a6a" stroke-width="1"></rect>
+          <text x="50" y="120" text-anchor="middle" class="node-title" font-size="13">Browser</text>
+          <text x="50" y="136" text-anchor="middle" class="node-sub">Extension</text>
+        </g>
+
+        <!-- 2: DOM -->
+        <g transform="translate(380,70)">
+          <rect class="node glow" rx="12" width="100" height="120"></rect>
+          <text x="50" y="48" text-anchor="middle" fill="#9fb4ff" font-weight="700">{ }</text>
+          <text x="50" y="120" text-anchor="middle" class="node-title" font-size="13">Direct DOM</text>
+          <text x="50" y="136" text-anchor="middle" class="node-sub">Rendered data</text>
+        </g>
+
+        <!-- 3: Review -->
+        <g transform="translate(610,70)">
+          <rect class="node glow" rx="12" width="110" height="120"></rect>
+          <g transform="translate(13,36)">
+            <rect x="0" y="0" width="84" height="20" rx="6" fill="#0a122a" stroke="#3953a4"></rect>
+            <line x1="12" y1="10" x2="72" y2="10" stroke="#65ffa7" stroke-width="3"></line>
+            <rect x="0" y="32" width="84" height="20" rx="6" fill="#0a122a" stroke="#3953a4"></rect>
+            <line x1="12" y1="42" x2="52" y2="42" stroke="#ff7a7a" stroke-width="3"></line>
+          </g>
+          <text x="55" y="120" text-anchor="middle" class="node-title" font-size="13">Review</text>
+          <text x="55" y="136" text-anchor="middle" class="node-sub">Confirm</text>
+        </g>
+
+        <!-- 4: App -->
+        <g transform="translate(820,36)">
+          <rect class="node glow" rx="12" width="100" height="100"></rect>
+          <text x="50" y="54" text-anchor="middle" fill="#9fffd0" font-weight="700">SDK</text>
+          <text x="50" y="86" text-anchor="middle" class="node-title" font-size="13">Your App</text>
+        </g>
+
+        <!-- 5: Webhook -->
+        <g transform="translate(820,146)">
+          <rect class="node glow" rx="12" width="100" height="100"></rect>
+          <text x="50" y="50" text-anchor="middle" fill="#a8c6ff" font-weight="700">POST</text>
+          <text x="50" y="84" text-anchor="middle" class="node-title" font-size="13">Webhook</text>
+        </g>
+
+        <!-- Packets (animated) -->
+        <circle r="6" class="packet glow">
+          <animateMotion dur="5s" repeatCount="indefinite" path="M170 130 L380 130 L430 130 L610 130"></animateMotion>
+        </circle>
+        <circle r="6" class="packet2 glow">
+          <animateMotion dur="4s" begin="1.2s" repeatCount="indefinite" path="M660 130 L820 90"></animateMotion>
+        </circle>
+        <circle r="6" class="packet3 glow">
+          <animateMotion dur="4s" begin="2.2s" repeatCount="indefinite" path="M660 130 L820 170"></animateMotion>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <h2>How it works</h2>
+    <p class="lead">A lightweight browser extension captures live DOM data, shows you what changed, and ships it straight from the browser.</p>
+    <div class="grid">
+      <div class="point fade">
+        <h4>1. Browser Extension</h4>
+        <p class="muted">Runs inside the user session/IP so traffic looks like normal browsing.</p>
+      </div>
+
+      <div class="point fade">
+        <h4>2. Direct DOM Access</h4>
+        <p class="muted">Reads fully rendered pages, including SPAs and dynamic content.</p>
+      </div>
+
+      <div class="point fade">
+        <h4>3. Live Change Detection</h4>
+        <div class="diff" id="diffCard">
+          <div class="diff-row">
+            <span class="key">price</span>
+            <span class="old">$129.00</span>
+            <span class="new">$119.00</span>
+          </div>
+          <div class="diff-row">
+            <span class="key">in_stock</span>
+            <span class="old">false</span>
+            <span class="new">true</span>
+          </div>
+        </div>
+        <button id="confirmBtn" class="confirm">Confirm & Send</button>
+        <small class="hint">Optional human-in-the-loop confirmation before data leaves the browser.</small>
+      </div>
+
+      <div class="point fade">
+        <h4>4. Your App (SDK)</h4>
+        <p class="muted">Receive clean JSON directly in your app, instantly.</p>
+      </div>
+
+      <div class="point fade">
+        <h4>5. Webhook Endpoint</h4>
+        <p class="muted">Or POST to any API, automation, or data pipeline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section id="benefits">
+    <h2>Key benefits</h2>
+    <div class="grid">
+      <div class="point fade">
+        <div class="icon-bg" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Shield with check -->
+            <path d="M12 3l7 4v5c0 5-3.5 9-7 9s-7-4-7-9V7l7-4z"></path>
+            <path d="M9 12l2 2l4-4"></path>
+          </svg>
+        </div>
+        <h4>Unblockable by design</h4>
+        <p class="muted">Browser‑native execution uses the live session/IP, making traffic look like real users and avoiding server‑side blocks.</p>
+      </div>
+
+      <div class="point fade">
+        <div class="icon-bg" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Lightning bolt -->
+            <polyline points="13 2 3 14 10 14 8 22 20 10 13 10 13 2"></polyline>
+          </svg>
+        </div>
+        <h4>Lightning‑fast</h4>
+        <p class="muted">Instant DOM reads in the browser — no queues, no proxy hops. Perfect for real‑time experiences.</p>
+      </div>
+
+      <div class="point fade">
+        <div class="icon-bg" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Live activity waveform -->
+            <path d="M3 12h3l3-7l4 14l3-7h5"></path>
+          </svg>
+        </div>
+        <h4>Live updates</h4>
+        <p class="muted">Diff changes as they happen and stream them to dashboards and alerts with minimal latency.</p>
+      </div>
+
+      <div class="point fade">
+        <div class="icon-bg" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Wallet icon -->
+            <rect x="3.5" y="7" width="17" height="12" rx="3"></rect>
+            <path d="M17 11.5h3.5v3H17a2.5 2.5 0 1 1 0-5h0z"></path>
+            <circle cx="18.8" cy="13" r="1"></circle>
+          </svg>
+        </div>
+        <h4>Lower costs</h4>
+        <p class="muted">No proxy/IP pools or scraping servers to run — a lean, client‑side footprint cuts infra spend.</p>
+      </div>
+
+      <div class="point fade">
+        <div class="icon-bg" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Code chevrons -->
+            <path d="M8 7l-5 5l5 5"></path>
+            <path d="M16 7l5 5l-5 5"></path>
+            <path d="M10 20l4-16"></path>
+          </svg>
+        </div>
+        <h4>Developer‑first</h4>
+        <p class="muted">Clean JSON schema, SDKs, and webhooks make integration straightforward and fast.</p>
+      </div>
+
+      <div class="point fade">
+        <div class="icon-bg" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Badge check (human-in-the-loop) -->
+            <circle cx="12" cy="12" r="8.5"></circle>
+            <path d="M8.5 12.5l2.5 2.5l4.5-5"></path>
+          </svg>
+        </div>
+        <h4>Human-in-the-loop</h4>
+        <p class="muted">Optionally review and confirm diffs before sending. Perfect for critical data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section id="use-cases">
+    <h2>Primary use cases</h2>
+    <div class="grid">
+      <div class="point fade">
+        <h4>Price & stock monitoring</h4>
+        <p class="muted">Instant updates and alerts from product pages without getting blocked.</p>
+      </div>
+      <div class="point fade">
+        <h4>Live lead & listing updates</h4>
+        <p class="muted">Track public profiles and listings as they change in real time.</p>
+      </div>
+      <div class="point fade">
+        <h4>Market & competitor intel</h4>
+        <p class="muted">Extract data from dynamic, JS-heavy sites reliably and fast.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT TEASER -->
+  <section id="teaser">
+    <h2>What’s in the private beta</h2>
+    <p class="lead">Start fast with the core building blocks. More integrations are on the way.</p>
+    <div class="grid">
+      <div class="point fade"><h4>JavaScript SDK</h4><p class="muted">In-page extraction and data delivery.</p></div>
+      <div class="point fade"><h4>Real-time field mapping</h4><p class="muted">Define schemas and keep them updated as pages shift.</p></div>
+      <div class="point fade"><h4>AI validation + optional OCR</h4><p class="muted">Normalize tricky content and confirm accuracy.</p></div>
+      <div class="point fade"><h4>Webhooks</h4><p class="muted">Send anywhere. Zapier/Make coming soon.</p></div>
+      <div class="point fade"><h4>Next up</h4><p class="muted">Python SDK and visual recorder.</p></div>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section id="signup">
+    <h2>Get priority access</h2>
+    <p class="lead">Join the waitlist to be first in line for invites. No spam — unsubscribe anytime.</p>
+
+    <div class="signup fade">
+      <form id="waitlistForm" novalidate>
+        <input type="email" id="email" name="email" placeholder="Work email" required class="full" />
+        <select id="usecase" name="usecase">
+          <option value="">Primary use case (optional)</option>
+          <option>Price/stock monitoring</option>
+          <option>Live lead & listing updates</option>
+          <option>Market & competitor intel</option>
+          <option>Other</option>
+        </select>
+        <input type="text" id="company" name="company" placeholder="Company (optional)" />
+        <label class="consent full">
+          <input type="checkbox" id="consent" required />
+          I agree to receive emails about the Scrapius.dev beta and updates.
+        </label>
+        <button class="btn submit" type="submit">Join the Waitlist</button>
+        <div id="success" class="success full">You’re on the list — thank you! We’ll be in touch soon.</div>
+      </form>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="faq">
+    <h2>FAQ</h2>
+
+    <div class="q fade">
+      <h4>Will this get blocked?</h4>
+      <p class="muted">Running in the browser makes traffic look like normal user sessions, which makes blocking far less likely.</p>
+    </div>
+
+    <div class="q fade">
+      <h4>Does it work on SPAs and dynamic content?</h4>
+      <p class="muted">Yes — Scrapius.dev reads the rendered DOM in real time.</p>
+    </div>
+
+    <div class="q fade">
+      <h4>Do you solve CAPTCHAs?</h4>
+      <p class="muted">Scrapius.dev avoids many server-side challenges by design. It does not automate CAPTCHA solving.</p>
+    </div>
+
+    <div class="q fade">
+      <h4>Behind login?</h4>
+      <p class="muted">Works within the user’s authenticated session.</p>
+    </div>
+
+    <div class="q fade">
+      <h4>Which browsers are supported?</h4>
+      <p class="muted">Modern Chromium-based browsers initially.</p>
+    </div>
+
+    <div class="q fade">
+      <h4>When can I try it?</h4>
+      <p class="muted">We’re in private beta. Join the waitlist for priority access.</p>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <!-- <section id="about">
+    <h2>About Scrapius.dev</h2>
+    <p class="lead">We’re building the fastest way for developers and data teams to get live, reliable web data — without proxy farms or brittle server scrapers.</p>
+  </section> -->
+</main>
+
+<footer>
+  <div class="container foot">
+    <a class="brand" href="#top">
+      <img src="./logo.png" alt="Scrapius.dev logo" />
+      <span class="name">Scrapius.dev</span>
+    </a>
+    <div class="links">
+      <a href="#signup">Join the Waitlist</a>
+      <a href="#">Privacy Policy (placeholder)</a>
+      <a href="#">Terms of Service (placeholder)</a>
+    </div>
+    <div class="copy">© 2025 Scrapius.dev. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=> {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }});
+  }, {threshold: .18, rootMargin: "0px 0px -40px 0px"});
+  document.querySelectorAll('.fade').forEach(el => io.observe(el));
+
+  // How-it-works demo logic: rotate diffs and confirm button effect
+  (function(){
+    const confirmBtn = document.getElementById('confirmBtn');
+    const diffCard = document.getElementById('diffCard');
+    if (!confirmBtn || !diffCard) return;
+
+    const variants = [
+      [
+        { key:'price', old:'$129.00', next:'$119.00'},
+        { key:'in_stock', old:'false', next:'true'}
+      ],
+      [
+        { key:'rating', old:'4.2', next:'4.6'},
+        { key:'reviews', old:'320', next:'351'}
+      ],
+      [
+        { key:'status', old:'draft', next:'published'},
+        { key:'updated_at', old:'12:04:11', next:'12:05:02'}
+      ]
+    ];
+    let i = 0;
+    function renderDiff(){
+      const set = variants[i++ % variants.length];
+      diffCard.innerHTML = set.map(r => (
+        '<div class="diff-row">' +
+        '<span class="key">'+r.key+'</span>' +
+        '<span class="old">'+r.old+'</span>' +
+        '<span class="new">'+r.next+'</span>' +
+        '</div>'
+      )).join('');
+    }
+    setInterval(renderDiff, 3800);
+
+    confirmBtn.addEventListener('click', ()=>{
+      confirmBtn.classList.add('sent');
+      confirmBtn.textContent = 'Sent ✓';
+      setTimeout(()=> {
+        confirmBtn.classList.remove('sent');
+        confirmBtn.textContent = 'Confirm & Send';
+      }, 1800);
+    });
+  })();
+
+  // Waitlist form: fake submit + success state
+  (function(){
+    const form = document.getElementById('waitlistForm');
+    const email = document.getElementById('email');
+    const consent = document.getElementById('consent');
+    const success = document.getElementById('success');
+
+    if (!form) return;
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if (!email.value || !consent.checked) {
+        alert('Please enter your email and accept consent.');
+        return;
+      }
+      // TODO: wire to ConvertKit or a tiny endpoint (Resend + Supabase) later.
+      success.classList.add('show');
+      form.reset();
+    });
+  })();
+</script>
+</body>
+</html>
