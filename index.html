@@ -254,6 +254,21 @@
           form{grid-template-columns:1fr}
           .submit{justify-self:stretch}
       }
+
+      .contact {
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .contact a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .contact a:hover {
+        color: #fff;
+      }
   </style>
 </head>
 <body>
@@ -546,10 +561,12 @@
     <p class="lead">Join the waitlist to be first in line for invites. No spam — unsubscribe anytime.</p>
 
     <div class="signup fade">
-      <form id="waitlistForm" novalidate>
+      <form id="waitlistForm" action="https://formspree.io/f/xwpqjbjv"
+            method="POST" novalidate>
         <input type="email" id="email" name="email" placeholder="Work email" required class="full" />
         <select id="usecase" name="usecase">
           <option value="">Primary use case (optional)</option>
+          <option>Odds/Scoreboards in betting</option>
           <option>Price/stock monitoring</option>
           <option>Live lead & listing updates</option>
           <option>Market & competitor intel</option>
@@ -561,6 +578,7 @@
           I agree to receive emails about the Scrapius.dev beta and updates.
         </label>
         <button class="btn submit" type="submit">Join the Waitlist</button>
+        <div id="my-form-status" class="full"></div>
         <div id="success" class="success full">You’re on the list — thank you! We’ll be in touch soon.</div>
       </form>
     </div>
@@ -616,12 +634,59 @@
     </a>
     <div class="links">
       <a href="#signup">Join the Waitlist</a>
-      <a href="#">Privacy Policy (placeholder)</a>
-      <a href="#">Terms of Service (placeholder)</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+    <div class="contact">
+      <a href="mailto:hello@scrapius.dev">hello@scrapius.dev</a>
     </div>
     <div class="copy">© 2025 Scrapius.dev. All rights reserved.</div>
   </div>
 </footer>
+
+<!-- Place this script at the end of the body tag -->
+<script>
+  var form = document.getElementById("waitlistForm");
+  const email = document.getElementById('email');
+  const consent = document.getElementById('consent');
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    var status = document.getElementById("my-form-status");
+    var data = new FormData(event.target);
+    var success = document.getElementById('success');
+
+    if (!email.value || !consent.checked) {
+      alert('Please enter your email and accept consent.');
+      return;
+    }
+
+    fetch(event.target.action, {
+      method: form.method,
+      body: data,
+      headers: {
+        'Accept': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        success.classList.add('show');
+        status.innerHTML = "";
+        form.reset()
+      } else {
+        response.json().then(data => {
+          if (Object.hasOwn(data, 'errors')) {
+            status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+          } else {
+            status.innerHTML = "Oops! There was a problem submitting your form"
+          }
+        })
+      }
+    }).catch(error => {
+      status.innerHTML = "Oops! There was a problem submitting your form"
+    });
+  }
+  form.addEventListener("submit", handleSubmit)
+</script>
 
 <script>
   // Reveal on scroll
@@ -672,26 +737,6 @@
       }, 1800);
     });
   })();
-
-  // Waitlist form: fake submit + success state
-  (function(){
-    const form = document.getElementById('waitlistForm');
-    const email = document.getElementById('email');
-    const consent = document.getElementById('consent');
-    const success = document.getElementById('success');
-
-    if (!form) return;
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      if (!email.value || !consent.checked) {
-        alert('Please enter your email and accept consent.');
-        return;
-      }
-      // TODO: wire to ConvertKit or a tiny endpoint (Resend + Supabase) later.
-      success.classList.add('show');
-      form.reset();
-    });
-  })();
-</script>
+  </script>
 </body>
 </html>
