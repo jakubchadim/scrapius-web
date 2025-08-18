@@ -75,6 +75,9 @@
       .nav a{color:var(--muted); text-decoration:none; font-weight:600; font-size:.95rem}
       .nav a:hover{color:#fff}
       .nav-links{display:flex; gap:20px; align-items:center}
+  .nav-toggle{display:none; background:transparent; color:#e3e9ff; border:1px solid var(--border); border-radius:10px; padding:8px 10px; line-height:0; align-items:center; justify-content:center}
+  .nav-toggle:hover{filter:brightness(1.06)}
+  .nav-toggle svg{width:22px; height:22px}
       .btn{
           background:linear-gradient(180deg, var(--accent), #305fff);
           color:#fff; padding:10px 16px; border-radius:10px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 10px 22px rgba(75,123,255,.35);
@@ -256,6 +259,11 @@
           .grid{grid-template-columns:1fr}
           form{grid-template-columns:1fr}
           .submit{justify-self:stretch}
+          .nav{position:relative}
+          .nav-toggle{display:inline-flex}
+          .nav-links{position:fixed; top:64px; left:0; right:0; display:none; flex-direction:column; gap:10px; padding:12px 20px 16px; background:rgba(7,13,31,0.98); border-bottom:1px solid rgba(255,255,255,0.06); box-shadow:0 10px 22px rgba(0,0,0,.35); z-index:90}
+          .nav-links.open{display:flex}
+          .nav a{padding:10px 6px}
       }
 
       .contact {
@@ -284,7 +292,14 @@
       <img src="./logo.png" alt="Scrapius.dev logo" />
       <span class="name">Scrapius.dev</span>
     </a>
-    <div class="nav-links">
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-navigation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+    <div class="nav-links" id="primary-navigation" role="navigation">
       <a href="#how-it-works">How it works</a>
       <a href="#benefits">Benefits</a>
       <a href="#use-cases">Use cases</a>
@@ -697,6 +712,36 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }});
   }, {threshold: .18, rootMargin: "0px 0px -40px 0px"});
   document.querySelectorAll('.fade').forEach(el => io.observe(el));
+
+  // Mobile nav toggle
+  (function(){
+    const toggle = document.getElementById('navToggle');
+    const menu = document.getElementById('primary-navigation');
+    if (!toggle || !menu) return;
+
+    function setOpen(open){
+      menu.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    toggle.addEventListener('click', ()=>{
+      const isOpen = menu.classList.contains('open');
+      setOpen(!isOpen);
+    });
+
+    // Close on link click (use event delegation)
+    menu.addEventListener('click', (e)=>{
+      if (e.target instanceof Element && e.target.tagName === 'A') {
+        setOpen(false);
+      }
+    });
+
+    // Close on escape
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
 
   // How-it-works demo logic: rotate diffs and confirm button effect
   (function(){
